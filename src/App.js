@@ -1,9 +1,11 @@
 import React from 'react';
+import IntroPage from './views/IntroPage/IntroPage';
+
 
 function App() {
   return (
-    <div>
-      <h1 className="text-3xl">SETTING QUIZ PROGRAM</h1>
+    <div className="flex justify-center items-center">
+      <IntroPage />
     </div>
   );
 }
