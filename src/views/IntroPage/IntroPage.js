@@ -4,14 +4,10 @@ import axios from 'axios';
 
 const IntroPage = () => {
 
-    // const [question, setQuestion] = useState(null);
-
-    const questTest = ({ setTest }) => {
-        axios.get("https://opentdb.com/api.php?amount=10")
+    const questTest = async () => {
+        await axios.get("https://opentdb.com/api.php?amount=10")
             .then((res) => {
-                console.log(res.data.results)
-                // setQuestion(res.data.results);\
-
+                localStorage.setItem('results', JSON.stringify(res.data.results));
             })
             .catch((error) => { console.log(error) });
     }
