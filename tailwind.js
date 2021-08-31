@@ -761,6 +761,7 @@ module.exports = {
       '-full': '-100%',
     }),
     width: (theme) => ({
+      custom: '56rem',
       auto: 'auto',
       ...theme('spacing'),
       '1/2': '50%',
