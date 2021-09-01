@@ -69,27 +69,27 @@ const QuizPage = () => {
         if (answer.match(answerCorrect)) {
             console.log("correct!!");
             handleShowModal();
-            quizIndex++;
+            // quizIndex++;
 
-            setQuestion(quizSet[quizIndex].question);
+            // setQuestion(quizSet[quizIndex].question);
 
-            answerArray = [];
+            // answerArray = [];
 
-            let incorrects = quizSet[quizIndex].incorrect_answers;
-            let corrects = quizSet[quizIndex].correct_answer;
+            // let incorrects = quizSet[quizIndex].incorrect_answers;
+            // let corrects = quizSet[quizIndex].correct_answer;
 
-            incorrects.map((incorrect) => answerArray.push(incorrect));
+            // incorrects.map((incorrect) => answerArray.push(incorrect));
 
-            answerArray.push(corrects);
-            setAnswerCorrect(corrects);
+            // answerArray.push(corrects);
+            // setAnswerCorrect(corrects);
 
-            function shuffle(answerArray) {
-                answerArray.sort(() => Math.random() - 0.5);
-            }
+            // function shuffle(answerArray) {
+            //     answerArray.sort(() => Math.random() - 0.5);
+            // }
 
-            shuffle(answerArray);
+            // shuffle(answerArray);
 
-            setAnswerDisplay(answerArray);
+            // setAnswerDisplay(answerArray);
         }
         else {
             console.log("not correct !")
@@ -116,7 +116,7 @@ const QuizPage = () => {
                             {answerDisplay.map((answerT, index) => <QuizCard answerT={answerT} key={index} setAnswer={setAnswer} />)}
                         </div>
                         <div className="flex">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-32 ml-auto" type="submit">
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-24 rounded mt-32 ml-auto" type="submit">
                                 제출
                             </button>
                         </div>
