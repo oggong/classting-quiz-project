@@ -13,34 +13,34 @@ const QuizPage = () => {
     const [answer, setAnswer] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [question, setQuestion] = useState('');
+    const [category, setCategory] = useState('');
+    const [difficulty, setDifficulty] = useState('');
     const [answerDisplay, setAnswerDisplay] = useState([]);
-
     const [answerCorrect, setAnswerCorrect] = useState('');
-
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         getQuizCollection().then((quizCollection) => {
-            // localStorage.setItem('results', JSON.stringify(quizCollection.data.results));
-            quizSet = quizCollection.data.results;
+            localStorage.setItem('quizCollection', JSON.stringify(quizCollection.data.results));
             setIsLoading(false);
-            quizSetting(quizSet);
+            quizSetting();
         });
     }, []);
 
-    const quizSetting = (quizSet) => {
-        // let quizSet = localStorage.getItem('results');
+    const quizSetting = () => {
+        quizSet = JSON.parse(localStorage.getItem('quizCollection'));
 
-        // setQuestion(JSON.parse(quizSet)[0].question);
-        // let incorrects = JSON.parse(quizSet)[0].incorrect_answers;
-        // let corrects = JSON.parse(quizSet)[0].correct_answer;
-
-        setQuestion(quizSet[quizIndex].question);
-
+        let questStringify = JSON.stringify(quizSet[quizIndex].question);
+        setQuestion(questStringify);
+        setDifficulty(quizSet[quizIndex].difficulty);
+        setCategory(quizSet[quizIndex].category);
         let incorrects = quizSet[quizIndex].incorrect_answers;
-        let corrects = quizSet[quizIndex].correct_answer;
+        let corrects = JSON.stringify(quizSet[quizIndex].correct_answer);
 
-        incorrects.map((incorrect) => answerArray.push(incorrect));
+        // 답안 초기화
+        answerArray = [];
+
+        incorrects.map((incorrect) => answerArray.push(JSON.stringify(incorrect)));
         answerArray.push(corrects);
         setAnswerCorrect(corrects);
 
@@ -58,57 +58,41 @@ const QuizPage = () => {
         setShowModal(!showModal);
     }, [showModal]);
 
-    const handleCloseModal = useCallback(() => {
-        setShowModal(false);
-    }, []);
-
     const onSubmit = (e) => {
         e.preventDefault();
-        // console.log(answer);
 
         if (answer.match(answerCorrect)) {
             console.log("correct!!");
+            // console.log("quizSet length : " + JSON.parse(quizSet).length);
+            // 모달 보이기 
             handleShowModal();
-            // quizIndex++;
+            quizIndex++;
 
-            // setQuestion(quizSet[quizIndex].question);
-
-            // answerArray = [];
-
-            // let incorrects = quizSet[quizIndex].incorrect_answers;
-            // let corrects = quizSet[quizIndex].correct_answer;
-
-            // incorrects.map((incorrect) => answerArray.push(incorrect));
-
-            // answerArray.push(corrects);
-            // setAnswerCorrect(corrects);
-
-            // function shuffle(answerArray) {
-            //     answerArray.sort(() => Math.random() - 0.5);
+            // if (JSON.parse(quizSet).length === quizIndex) {
+            //     console.log("TEst")
+            // } {
+            //     quizIndex++;
             // }
-
-            // shuffle(answerArray);
-
-            // setAnswerDisplay(answerArray);
+            // 퀴즈 셋팅
+            quizSetting();
         }
         else {
             console.log("not correct !")
         }
-
     }
 
 
 
     return (
         <div className="relative flex flex-col w-100 h-100 justify-center items-center mt-32">
-            {showModal && <QuizModal onCancel={handleCloseModal} />}
+            {showModal && <QuizModal />}
 
             { !isLoading && question.length === 0 && <h1 className="text-3xl text-bold font-mono">문제가 없습니다 ....</h1>}
             { isLoading ? <h1 className="text-3xl text-bold font-mono">문제 가져오는 중...</h1>
                 : <div className="flex flex-col justify-center items-center">
                     <div className="flex flex-col justify-center items-center">
                         <h1 className="text-3xl text-bold font-mono">{question}</h1>
-                        <h1 className="text-3xl text-bold font-mono mt-32">choose correct answer!</h1>
+                        <h1 className="text-3xl text-bold font-mono mt-32">Category : {category}, Difficulty : {difficulty} </h1>
                         <QuizTimer />
                     </div>
                     <form onSubmit={onSubmit} className="flex flex-col">
