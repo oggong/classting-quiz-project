@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import QuizCard from "../../components/QuizCard/QuizCard";
 import QuizTimer from '../../components/QuizTimer/QuizTimer';
 import QuizModal from '../../components/QuizModal/QuizModal';
-import { getQuizCollection } from '../../api';
+
 
 let quizSet = null;
 let quizIndex = 0;
@@ -10,7 +11,7 @@ let answerArray = [];
 
 const QuizPage = () => {
 
-    const [answer, setAnswer] = useState(null);
+    const [answer, setAnswer] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [question, setQuestion] = useState('');
     const [category, setCategory] = useState('');
@@ -18,14 +19,18 @@ const QuizPage = () => {
     const [answerDisplay, setAnswerDisplay] = useState([]);
     const [answerCorrect, setAnswerCorrect] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [modalContent, setModalContent] = useState(false);
+    const [showSubmitButton, setShowSubmitButton] = useState(false);
+    const [moveNextQuiz, setMoveNextQuiz] = useState(false);
+
+    const history = useHistory();
 
     useEffect(() => {
-        getQuizCollection().then((quizCollection) => {
-            localStorage.setItem('quizCollection', JSON.stringify(quizCollection.data.results));
-            setIsLoading(false);
-            quizSetting();
-        });
+        setIsLoading(false);
+        quizSetting();
+        setShowSubmitButton(false);
     }, []);
+
 
     const quizSetting = () => {
         quizSet = JSON.parse(localStorage.getItem('quizCollection'));
@@ -35,12 +40,12 @@ const QuizPage = () => {
         setDifficulty(quizSet[quizIndex].difficulty);
         setCategory(quizSet[quizIndex].category);
         let incorrects = quizSet[quizIndex].incorrect_answers;
-        let corrects = JSON.stringify(quizSet[quizIndex].correct_answer);
+        let corrects = quizSet[quizIndex].correct_answer;
 
         // 답안 초기화
         answerArray = [];
 
-        incorrects.map((incorrect) => answerArray.push(JSON.stringify(incorrect)));
+        incorrects.map((incorrect) => answerArray.push(incorrect));
         answerArray.push(corrects);
         setAnswerCorrect(corrects);
 
@@ -48,7 +53,9 @@ const QuizPage = () => {
             answerArray.sort(() => Math.random() - 0.5);
         }
 
-        shuffle(answerArray);
+        if (answerArray.length !== 2) {
+            shuffle(answerArray);
+        }
 
         setAnswerDisplay(answerArray);
     }
@@ -58,34 +65,51 @@ const QuizPage = () => {
         setShowModal(!showModal);
     }, [showModal]);
 
+    useEffect(() => {
+        if (answer !== '') {
+            if (answer.match(answerCorrect)) {
+                setModalContent(true);
+                // handleShowModal();
+            }
+            else {
+                setModalContent(false);
+                // handleShowModal();
+            }
+            setShowSubmitButton(true);
+        }
+    }, [answer]);
+
+    useEffect(() => {
+        if (moveNextQuiz === true) {
+            if (quizSet.length === quizIndex + 1) {
+                history.push('/results')
+            }
+            else {
+
+                quizIndex++;
+                // 퀴즈 셋팅
+                quizSetting();
+                handleShowModal();
+                setMoveNextQuiz(false);
+            };
+        }
+    }, [moveNextQuiz])
+
     const onSubmit = (e) => {
         e.preventDefault();
+        // 초기화
+        e.target.reset();
 
-        if (answer.match(answerCorrect)) {
-            console.log("correct!!");
-            // console.log("quizSet length : " + JSON.parse(quizSet).length);
-            // 모달 보이기 
-            handleShowModal();
-            quizIndex++;
-
-            // if (JSON.parse(quizSet).length === quizIndex) {
-            //     console.log("TEst")
-            // } {
-            //     quizIndex++;
-            // }
-            // 퀴즈 셋팅
-            quizSetting();
-        }
-        else {
-            console.log("not correct !")
-        }
+        handleShowModal();
     }
+
+
 
 
 
     return (
         <div className="relative flex flex-col w-100 h-100 justify-center items-center mt-32">
-            {showModal && <QuizModal />}
+            {showModal && <QuizModal modalContent={modalContent} answerCorrect={answerCorrect} setMoveNextQuiz={setMoveNextQuiz} />}
 
             { !isLoading && question.length === 0 && <h1 className="text-3xl text-bold font-mono">문제가 없습니다 ....</h1>}
             { isLoading ? <h1 className="text-3xl text-bold font-mono">문제 가져오는 중...</h1>
@@ -95,14 +119,15 @@ const QuizPage = () => {
                         <h1 className="text-3xl text-bold font-mono mt-32">Category : {category}, Difficulty : {difficulty} </h1>
                         <QuizTimer />
                     </div>
-                    <form onSubmit={onSubmit} className="flex flex-col">
+
+                    <form className="flex flex-col" onSubmit={onSubmit}>
                         <div className="flex w-100">
                             {answerDisplay.map((answerT, index) => <QuizCard answerT={answerT} key={index} setAnswer={setAnswer} />)}
                         </div>
-                        <div className="flex">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-24 rounded mt-32 ml-auto" type="submit">
-                                제출
-                            </button>
+                        <div className="flex w-100">
+                            {showSubmitButton ? <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-24 rounded mt-32 ml-auto" type="submit">
+                                답변 제출
+                            </button> : <div></div>}
                         </div>
                     </form>
                 </div>
