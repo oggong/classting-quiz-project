@@ -8,8 +8,6 @@ const ReviewPage = () => {
     const history = useHistory();
 
     useEffect(() => {
-        console.log("quizCollection : " + localStorage.getItem('quizCollection'));
-        console.log("results : " + JSON.parse(localStorage.getItem('results')));
         let quizCollection = JSON.parse(localStorage.getItem('quizCollection'));
         let indexCheck = JSON.parse(localStorage.getItem('results'));
 
