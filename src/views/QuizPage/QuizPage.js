@@ -28,6 +28,7 @@ const QuizPage = () => {
     const timerRef = useRef();
 
     useEffect(() => {
+        quizIndex = 0;
         setIsLoading(false);
         quizSetting();
         setShowSubmitButton(false);

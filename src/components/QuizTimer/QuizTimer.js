@@ -26,6 +26,7 @@ const QuizTimer = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         saveTimer() {
             localStorage.setItem('complete_time', time);
+            initialTime = 0;
         }
     }));
 
