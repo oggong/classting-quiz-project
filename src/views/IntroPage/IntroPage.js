@@ -12,7 +12,7 @@ const IntroPage = () => {
         getQuizCollection().then((quizCollection) => {
             localStorage.setItem('quizCollection', JSON.stringify(quizCollection.data.results));
             localStorage.setItem('results', JSON.stringify([]));
-            history.push('/quiz')
+            history.push('/quiz');
         });
 
     }

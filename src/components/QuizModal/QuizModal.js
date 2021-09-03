@@ -1,12 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import circleImage from '../../assets/circle.png';
 import crossImage from '../../assets/cross.png';
 
 const QuizModal = ({ modalContent, answerCorrect, setMoveNextQuiz, moveResultPage }) => {
-
-    useEffect(() => {
-        console.log(moveResultPage);
-    }, [])
 
     return (
         <div className="absolute md:w-1/3 sm:w-full rounded-lg shadow-lg bg-gray-100 flex flex-col justify-content items-center my-3">

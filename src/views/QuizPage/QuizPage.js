@@ -33,7 +33,6 @@ const QuizPage = () => {
         setShowSubmitButton(false);
     }, []);
 
-
     const quizSetting = () => {
         quizSet = JSON.parse(localStorage.getItem('quizCollection'));
 
@@ -92,7 +91,6 @@ const QuizPage = () => {
                 quizSetting();
                 handleShowModal();
             };
-            // setMoveResultPage('');
             setMoveNextQuiz(false);
         }
     }, [moveNextQuiz]);
@@ -104,7 +102,7 @@ const QuizPage = () => {
         e.target.reset();
 
         // 답이 맞은 경우
-        if (answer.match(answerCorrect)) {
+        if (answer.includes(answerCorrect)) {
             setModalContent(true);
             setResult(true);
         }
