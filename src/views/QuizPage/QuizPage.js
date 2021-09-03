@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import QuizCard from "../../components/QuizCard/QuizCard";
 import QuizTimer from '../../components/QuizTimer/QuizTimer';
@@ -22,8 +22,10 @@ const QuizPage = () => {
     const [modalContent, setModalContent] = useState(false);
     const [showSubmitButton, setShowSubmitButton] = useState(false);
     const [moveNextQuiz, setMoveNextQuiz] = useState(false);
+    const [moveResultPage, setMoveResultPage] = useState('다음 문제');
 
     const history = useHistory();
+    const timerRef = useRef();
 
     useEffect(() => {
         setIsLoading(false);
@@ -65,16 +67,15 @@ const QuizPage = () => {
         setShowModal(!showModal);
     }, [showModal]);
 
+    const setResult = (result) => {
+        let results = JSON.parse(localStorage.getItem('results'));
+        results.push(result);
+        localStorage.setItem('results', JSON.stringify(results));
+        console.log(JSON.parse(localStorage.getItem('results')));
+    };
+
     useEffect(() => {
         if (answer !== '') {
-            if (answer.match(answerCorrect)) {
-                setModalContent(true);
-                // handleShowModal();
-            }
-            else {
-                setModalContent(false);
-                // handleShowModal();
-            }
             setShowSubmitButton(true);
         }
     }, [answer]);
@@ -82,34 +83,44 @@ const QuizPage = () => {
     useEffect(() => {
         if (moveNextQuiz === true) {
             if (quizSet.length === quizIndex + 1) {
-                history.push('/results')
+                timerRef.current.saveTimer();
+                history.push('/results');
             }
             else {
-
                 quizIndex++;
                 // 퀴즈 셋팅
                 quizSetting();
                 handleShowModal();
-                setMoveNextQuiz(false);
             };
+            // setMoveResultPage('');
+            setMoveNextQuiz(false);
         }
-    }, [moveNextQuiz])
+    }, [moveNextQuiz]);
 
+    // 답변 제출
     const onSubmit = (e) => {
         e.preventDefault();
         // 초기화
         e.target.reset();
 
+        // 답이 맞은 경우
+        if (answer.match(answerCorrect)) {
+            setModalContent(true);
+            setResult(true);
+        }
+        // 답이 틀린 경우
+        else {
+            setModalContent(false);
+            setResult(false);
+        }
+
+        if (quizSet.length === quizIndex + 1) setMoveResultPage('결과 보기');
         handleShowModal();
     }
 
-
-
-
-
     return (
         <div className="relative flex flex-col w-100 h-100 justify-center items-center mt-32">
-            {showModal && <QuizModal modalContent={modalContent} answerCorrect={answerCorrect} setMoveNextQuiz={setMoveNextQuiz} />}
+            {showModal && <QuizModal modalContent={modalContent} answerCorrect={answerCorrect} setMoveNextQuiz={setMoveNextQuiz} moveResultPage={moveResultPage} />}
 
             { !isLoading && question.length === 0 && <h1 className="text-3xl text-bold font-mono">문제가 없습니다 ....</h1>}
             { isLoading ? <h1 className="text-3xl text-bold font-mono">문제 가져오는 중...</h1>
@@ -117,7 +128,7 @@ const QuizPage = () => {
                     <div className="flex flex-col justify-center items-center">
                         <h1 className="text-3xl text-bold font-mono">{question}</h1>
                         <h1 className="text-3xl text-bold font-mono mt-32">Category : {category}, Difficulty : {difficulty} </h1>
-                        <QuizTimer />
+                        <QuizTimer ref={timerRef} />
                     </div>
 
                     <form className="flex flex-col" onSubmit={onSubmit}>

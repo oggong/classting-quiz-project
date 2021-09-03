@@ -9,6 +9,7 @@ const IntroPage = () => {
     const clickAndGetQuiz = () => {
         getQuizCollection().then((quizCollection) => {
             localStorage.setItem('quizCollection', JSON.stringify(quizCollection.data.results));
+            localStorage.setItem('results', JSON.stringify([]));
             history.push('/quiz')
         });
 
@@ -20,7 +21,7 @@ const IntroPage = () => {
             <h1 className="font-bold text-500 text-3xl mx-auto mt-32">간단한 퀴즈를 풀어보세요</h1>
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold mt-32 py-2 px-4 rounded" onClick={clickAndGetQuiz}>
                 퀴즈 시작
-                </button>
+            </button>
         </div>
     )
 };
